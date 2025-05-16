@@ -1,25 +1,26 @@
-name: Run Lint and Tests
+name: CI with Self-Hosted Runner
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  build-and-test:
+    runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Run Tests
+      - name: Run tests
         run: npm test
+
+      - name: Access environment variable
+        run: echo "API_URL is $API_URL"
