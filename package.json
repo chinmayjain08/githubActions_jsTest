@@ -1,0 +1,12 @@
+{
+  "name": "githubactions-jstest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "add.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "devDependencies": {},
+  "license": "ISC"
+}
