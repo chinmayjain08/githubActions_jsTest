@@ -1,5 +1,5 @@
-// eslint.config.js
-export default [
+// eslint.config.js (CommonJS style)
+module.exports = [
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -13,7 +13,6 @@ export default [
       },
     },
     rules: {
-      // Example rules (customize as needed)
       semi: ['error', 'always'],
       quotes: ['error', 'single'],
     },
