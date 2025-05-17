@@ -1,14 +1,17 @@
-name: CI with Self-Hosted Runner
+name: CI with Slack Notification
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
-    runs-on: self-hosted
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -16,10 +19,23 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests
         run: npm test
 
-      - name: Access environment variable
-        run: echo "API_URL is $API_URL"
+  notify:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()  # ensures notification is sent even if build fails
+
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Build on *${{ github.repository }}* has *${{ job.status }}*.\nCommit: `${{ github.sha }}` by ${{ github.actor }}."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
