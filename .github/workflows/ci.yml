@@ -1,4 +1,4 @@
-name: CI with Slack Notification
+name: CI/CD with Approval
 
 on:
   push:
@@ -6,36 +6,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test-and-lint:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
+
+      - name: Run lint
+        run: npm run lint
 
       - name: Run tests
         run: npm test
 
-  notify:
-    needs: build
+  deploy-to-production:
+    needs: test-and-lint
     runs-on: ubuntu-latest
-    if: always()  # ensures notification is sent even if build fails
-
+    environment:
+      name: production
+      # GitHub will pause here and wait for manual approval
     steps:
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "Build on *${{ github.repository }}* has *${{ job.status }}*.\nCommit: `${{ github.sha }}` by ${{ github.actor }}."
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Deploying to production
+        run: echo "Deploying to production..."
